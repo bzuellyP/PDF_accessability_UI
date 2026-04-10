@@ -194,6 +194,11 @@ export class CdkBackendStack extends cdk.Stack {
       signInAliases: { email: true },
 
       autoVerify: { email: true },
+      userVerification: {
+        emailStyle: cognito.VerificationEmailStyle.LINK,
+        emailSubject: 'Verify your email for PDF Accessibility',
+        emailBody: 'Please click the link below to verify your email address: {##Verify Email##}',
+      },
       passwordPolicy: {
         minLength: 8,
         requireLowercase: true,
@@ -542,6 +547,43 @@ export class CdkBackendStack extends cdk.Stack {
     updateAttributesGroupsFn.addPermission('AllowEventBridgeInvoke', {
       principal: new iam.ServicePrincipal('events.amazonaws.com'),
       sourceArn: cognitoGroupChangeRule.ruleArn,
+    });
+
+    const preSignUpRole = new iam.Role(this, 'PreSignUpRole', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+      description: 'IAM role for PreSignUp Lambda function',
+    });
+
+    preSignUpRole.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
+    );
+
+    const preSignUpFn = new lambda.Function(this, 'PreSignUpLambda', {
+      runtime: lambda.Runtime.PYTHON_3_12,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset('lambda/preSignUp/'),
+      timeout: cdk.Duration.seconds(30),
+      role: preSignUpRole,
+    });
+
+    // Attach the preSignUp trigger to the user pool
+    userPool.addTrigger(cognito.UserPoolOperation.PRE_SIGN_UP, preSignUpFn);
+
+    // Scoped Cognito policy for listing and deleting UNCONFIRMED users
+    new iam.CfnPolicy(this, 'PreSignUpCognitoPolicy', {
+      policyName: 'PreSignUpCognitoAccess',
+      policyDocument: {
+        Version: '2012-10-17',
+        Statement: [{
+          Effect: 'Allow',
+          Action: [
+            'cognito-idp:ListUsers',
+            'cognito-idp:AdminDeleteUser',
+          ],
+          Resource: userPool.userPoolArn,
+        }],
+      },
+      roles: [preSignUpRole.roleName],
     });
     
     // --------------------------- Outputs ------------------------------
