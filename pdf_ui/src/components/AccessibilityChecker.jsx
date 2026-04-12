@@ -21,6 +21,7 @@ import {
   IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import DownloadIcon from '@mui/icons-material/Download';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import {
@@ -335,10 +336,10 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
             size="small"
             disabled={!beforeReportUrl || isBeforeUrlLoading}
             onClick={() => window.open(beforeReportUrl, '_blank')}
-            startIcon={isBeforeUrlLoading && <CircularProgress size={14} />}
+            startIcon={isBeforeUrlLoading ? <CircularProgress size={14} /> : <DownloadIcon fontSize="small" />}
             sx={{ fontSize: '0.75rem', padding: '4px 8px' }}
           >
-            Before
+            Before Report
           </Button>
 
           {/* Download AFTER JSON button */}
@@ -348,10 +349,10 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
             size="small"
             disabled={!afterReportUrl || isAfterUrlLoading}
             onClick={() => window.open(afterReportUrl, '_blank')}
-            startIcon={isAfterUrlLoading && <CircularProgress size={14} />}
+            startIcon={isAfterUrlLoading ? <CircularProgress size={14} /> : <DownloadIcon fontSize="small" />}
             sx={{ fontSize: '0.75rem', padding: '4px 8px' }}
           >
-            After
+            After Report
           </Button>
 
           <IconButton onClick={handleClose} size="small">
@@ -359,8 +360,8 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
           </IconButton>
         </Box>
       </DialogTitle>
-      <DialogContent>
-      <Box>
+      <DialogContent sx={{ marginY: '1rem' }}>
+        <Box>
           <Box sx={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
             {renderSummary(beforeReport, 'Before')}
             {renderSummary(afterReport, 'After')}
@@ -375,15 +376,9 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
             </Typography>
           )}
 
-        <Box sx={{ marginTop: '1rem' }}>{renderDetailedReport()}</Box>
-      </Box>
+          <Box sx={{ marginTop: '1rem' }}>{renderDetailedReport()}</Box>
+        </Box>
       </DialogContent>
-
-      <DialogActions sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, padding: '1rem' }}>
-        <Button onClick={handleClose} color="secondary" variant="contained">
-          Close
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 }
