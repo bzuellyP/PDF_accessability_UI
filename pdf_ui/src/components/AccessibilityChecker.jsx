@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -21,6 +20,7 @@ import {
   IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import DownloadIcon from '@mui/icons-material/Download';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import {
@@ -47,6 +47,9 @@ function AccessibilityChecker({ originalFileName, updatedFilename, awsCredential
   const [isBeforeUrlLoading, setIsBeforeUrlLoading] = useState(false);
   const [isAfterUrlLoading, setIsAfterUrlLoading] = useState(false);
 
+  // Track which accordion panels are expanded
+  const [expandedPanels, setExpandedPanels] = useState({});
+
 
   const UpdatedFileKeyWithoutExtension = updatedFilename ? updatedFilename.replace(/\.pdf$/i, '') : '';
   const beforeReportKey = `temp/${UpdatedFileKeyWithoutExtension}/accessability-report/${UpdatedFileKeyWithoutExtension}_accessibility_report_before_remidiation.json`;
@@ -56,6 +59,12 @@ function AccessibilityChecker({ originalFileName, updatedFilename, awsCredential
   const desiredFilenameBefore = `COMPLIANT_${OriginalFileKeyWithoutExtension}_before_remediation_accessibility_report.json`;
   const desiredFilenameAfter = `COMPLIANT_${OriginalFileKeyWithoutExtension}_after_remediation_accessibility_report.json`;
 
+  useEffect(() => {
+    if(open) {
+      setExpandedPanels({});
+    }
+  }, [open, updatedFilename]);
+  
   const s3 = useMemo(() => {
     if (!awsCredentials?.accessKeyId) {
       console.warn('AWS credentials not available yet');
@@ -245,20 +254,57 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
     if (!beforeReport) return <CircularProgress />;
 
     const categories = Object.keys(beforeReport['Detailed Report'] || {});
-    return categories.map((category) => {
-      const beforeItems = beforeReport['Detailed Report'][category] || [];
-      const afterItems = afterReport?.['Detailed Report']?.[category] || [];
-      const allRules = new Set([
-        ...beforeItems.map((item) => item.Rule),
-        ...afterItems.map((item) => item.Rule),
-      ]);
-      const afterMap = afterItems.reduce((acc, item) => {
-        acc[item.Rule] = item;
-        return acc;
-      }, {});
 
-      return (
-        <Accordion key={category} sx={{ border: '1px solid #ddd', margin: '0.5rem 0' }}>
+    const allExpanded = categories.length > 0 && categories.every(cat => expandedPanels[cat]);
+
+    const handleToggleAll = () => {
+      if (allExpanded) {
+        setExpandedPanels({});
+      } else {
+        const all = {};
+        categories.forEach(cat => { all[cat] = true; });
+        setExpandedPanels(all);
+      }
+    };
+
+    const handleAccordionChange = (category) => (_, isExpanded) => {
+      setExpandedPanels(prev => ({ ...prev, [category]: isExpanded }));
+    };
+
+    return (
+      <>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2rem' }}>
+          <Typography variant="h5" sx={{ color: '#1565c0', fontWeight: 'bold' }}>
+            Detailed Report
+          </Typography>
+          <Button
+            variant="text"
+            size="small"
+            onClick={handleToggleAll}
+            sx={{ textTransform: 'none', fontSize: '0.85rem' }}
+          >
+            {allExpanded ? 'Collapse All' : 'Expand All'}
+          </Button>
+        </Box>
+        {categories.map((category) => {
+          const beforeItems = beforeReport['Detailed Report'][category] || [];
+          const afterItems = afterReport?.['Detailed Report']?.[category] || [];
+          const allRules = new Set([
+            ...beforeItems.map((item) => item.Rule),
+            ...afterItems.map((item) => item.Rule),
+          ]);
+          const afterMap = afterItems.reduce((acc, item) => {
+            acc[item.Rule] = item;
+            return acc;
+          }, {});
+
+          return (
+            <Accordion
+              key={category}
+              expanded={!!expandedPanels[category]}
+              onChange={handleAccordionChange(category)}
+              sx={{ border: '1px solid #ddd', margin: '0.5rem 0' }}
+            >
           <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ backgroundColor: '#e3f2fd' }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
               {category}
@@ -317,7 +363,9 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
           </AccordionDetails>
         </Accordion>
       );
-    });
+    })}
+    </>
+    );
   };
 
   return (
@@ -334,11 +382,11 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
             color="primary"
             size="small"
             disabled={!beforeReportUrl || isBeforeUrlLoading}
-            onClick={() => window.open(beforeReportUrl, '_blank')}
-            startIcon={isBeforeUrlLoading && <CircularProgress size={14} />}
+            onClick={() => window.open(beforeReportUrl, '_blank', 'noopener,noreferrer')}
+            startIcon={isBeforeUrlLoading ? <CircularProgress size={14} /> : <DownloadIcon fontSize="small" />}
             sx={{ fontSize: '0.75rem', padding: '4px 8px' }}
           >
-            Before
+            Before Report
           </Button>
 
           {/* Download AFTER JSON button */}
@@ -347,11 +395,11 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
             color="primary"
             size="small"
             disabled={!afterReportUrl || isAfterUrlLoading}
-            onClick={() => window.open(afterReportUrl, '_blank')}
-            startIcon={isAfterUrlLoading && <CircularProgress size={14} />}
+            onClick={() => window.open(afterReportUrl, '_blank', 'noopener,noreferrer')}
+            startIcon={isAfterUrlLoading ? <CircularProgress size={14} /> : <DownloadIcon fontSize="small" />}
             sx={{ fontSize: '0.75rem', padding: '4px 8px' }}
           >
-            After
+            After Report
           </Button>
 
           <IconButton onClick={handleClose} size="small">
@@ -359,31 +407,22 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
           </IconButton>
         </Box>
       </DialogTitle>
-      <DialogContent>
-      <Box>
+      <DialogContent sx={{ marginY: '1rem' }}>
+        <Box>
           <Box sx={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
             {renderSummary(beforeReport, 'Before')}
             {renderSummary(afterReport, 'After')}
           </Box>
 
-          <Typography variant="h5" sx={{ marginTop: '2rem', color: '#1565c0', fontWeight: 'bold' }}>
-            Detailed Report
-          </Typography>
           {(!beforeReport || !afterReport) && (
             <Typography variant="body2" color="textSecondary">
               Loading accessibility reports...
             </Typography>
           )}
 
-        <Box sx={{ marginTop: '1rem' }}>{renderDetailedReport()}</Box>
-      </Box>
+          <Box sx={{ marginTop: '1rem' }}>{renderDetailedReport()}</Box>
+        </Box>
       </DialogContent>
-
-      <DialogActions sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, padding: '1rem' }}>
-        <Button onClick={handleClose} color="secondary" variant="contained">
-          Close
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 }
