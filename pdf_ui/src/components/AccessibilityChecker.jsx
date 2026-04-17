@@ -59,6 +59,12 @@ function AccessibilityChecker({ originalFileName, updatedFilename, awsCredential
   const desiredFilenameBefore = `COMPLIANT_${OriginalFileKeyWithoutExtension}_before_remediation_accessibility_report.json`;
   const desiredFilenameAfter = `COMPLIANT_${OriginalFileKeyWithoutExtension}_after_remediation_accessibility_report.json`;
 
+  useEffect(() => {
+    if(open) {
+      setExpandedPanels({});
+    }
+  }, [open, updatedFilename]);
+  
   const s3 = useMemo(() => {
     if (!awsCredentials?.accessKeyId) {
       console.warn('AWS credentials not available yet');
@@ -376,7 +382,7 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
             color="primary"
             size="small"
             disabled={!beforeReportUrl || isBeforeUrlLoading}
-            onClick={() => window.open(beforeReportUrl, '_blank')}
+            onClick={() => window.open(beforeReportUrl, '_blank', 'noopener,noreferrer')}
             startIcon={isBeforeUrlLoading ? <CircularProgress size={14} /> : <DownloadIcon fontSize="small" />}
             sx={{ fontSize: '0.75rem', padding: '4px 8px' }}
           >
@@ -389,7 +395,7 @@ const generatePresignedUrl = useCallback(async (key, filename) => {
             color="primary"
             size="small"
             disabled={!afterReportUrl || isAfterUrlLoading}
-            onClick={() => window.open(afterReportUrl, '_blank')}
+            onClick={() => window.open(afterReportUrl, '_blank', 'noopener,noreferrer')}
             startIcon={isAfterUrlLoading ? <CircularProgress size={14} /> : <DownloadIcon fontSize="small" />}
             sx={{ fontSize: '0.75rem', padding: '4px 8px' }}
           >
