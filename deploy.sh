@@ -375,8 +375,8 @@ else
             "Effect": "Allow",
             "Action": [
                 "ssm:GetParameter",
-                “ssm:PutParameter”,
-                “ssm:DeleteParameter”
+                "ssm:PutParameter",
+                "ssm:DeleteParameter"
             ],
             "Resource": "arn:aws:ssm:'"$AWS_REGION"':'"$AWS_ACCOUNT_ID"':parameter/cdk-bootstrap/*"
         },
