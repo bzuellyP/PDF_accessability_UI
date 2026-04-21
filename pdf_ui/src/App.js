@@ -25,7 +25,7 @@ const cognitoAuthConfig = {
   post_logout_redirect_uri: `${HostedUIUrl}/home`,
   response_type: 'code',
   scope: 'email openid phone profile',
-  metadata: {
+  metadataSeed: {
     issuer: `https://${Authority}`,
     authorization_endpoint: `https://${DomainPrefix}.auth.us-east-2.amazoncognito.com/oauth2/authorize`,
     token_endpoint: `https://${DomainPrefix}.auth.us-east-2.amazoncognito.com/oauth2/token`,
