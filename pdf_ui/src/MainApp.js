@@ -233,12 +233,15 @@ function MainApp({ isLoggingOut, setIsLoggingOut }) {
         }}>
           <Header
             handleSignOut={() => {
-            const domain = `https://${DomainPrefix}.auth.us-east-2.amazoncognito.com`;
-            const clientId = '5r64i15glnfblosefhghiqdgvr';
-            const logoutUri = encodeURIComponent('https://pdftool.it.purdue.edu/home');
-            const idToken = auth.user?.id_token;
-            window.location.href = `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}&id_token_hint=${idToken}`;
-            }}
+  setIsLoggingOut(true);
+  const domain = `https://${DomainPrefix}.auth.us-east-2.amazoncognito.com`;
+  const clientId = '5r64i15glnfblosefhghiqdgvr';
+  const logoutUri = encodeURIComponent('https://pdftool.it.purdue.edu/home');
+  const idToken = auth.user?.id_token;
+  auth.removeUser().then(() => {
+    window.location.href = `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}&id_token_hint=${idToken}`;
+  });
+}}
             usageCount={usageCount}
             refreshUsage={refreshUsage}
             usageError={usageError}
