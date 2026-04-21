@@ -233,7 +233,7 @@ function Header({ handleSignOut, usageCount, maxFilesAllowed, refreshUsage, usag
             }}
             aria-label="Home Button"
           >
-            {isMobile ? 'Home' : 'Home'}
+            {isMobile ? 'Out' : 'Sign Out'}
           </Button>
         </Box>
       </Toolbar>

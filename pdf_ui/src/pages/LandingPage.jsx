@@ -83,13 +83,11 @@ const LandingPage = () => {
   }, [auth.isLoading, auth.isAuthenticated, navigate]);
 
   const handleSignIn = () => {
-    setLoading(true);
-    // Introduce a 1-second delay before redirecting
-    setTimeout(() => {
-      auth.signinRedirect();
-      // No need to reset loading here as redirect will occur
-    }, 1000);
-  };
+  setLoading(true);
+  setTimeout(() => {
+    auth.signinRedirect({ extraQueryParams: { prompt: 'login' } });
+  }, 1000);
+};
 
   const handleOpenDialog = () => {
     setOpenDialog(true);

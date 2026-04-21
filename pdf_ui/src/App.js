@@ -10,7 +10,7 @@ import { AuthProvider, useAuth } from 'react-oidc-context';
 import {isMaintenanceMode} from './utilities/constants.jsx';
 
 import theme from './theme';
-import { UserPoolClientId, HostedUIUrl, Authority } from './utilities/constants';
+import { UserPoolClientId, HostedUIUrl, Authority, DomainPrefix } from './utilities/constants';
 
 import LandingPage from './pages/LandingPage';
 
@@ -21,12 +21,17 @@ import MaintenancePage from './pages/MaintenancePage';
 const cognitoAuthConfig = {
   authority: `https://${Authority}`,
   client_id: UserPoolClientId,
-  redirect_uri: `${HostedUIUrl}/callback`, // Amplify redirect_uri
+  redirect_uri: `${HostedUIUrl}/callback`,
   post_logout_redirect_uri: `${HostedUIUrl}/home`,
-  // redirect_uri: 'http://localhost:3000/callback', // Local redirect_uri
-  // post_logout_redirect_uri: 'http://localhost:3000/home',
   response_type: 'code',
   scope: 'email openid phone profile',
+  metadataSeed: {
+    issuer: `https://${Authority}`,
+    authorization_endpoint: `https://${DomainPrefix}.auth.us-east-2.amazoncognito.com/oauth2/authorize`,
+    token_endpoint: `https://${DomainPrefix}.auth.us-east-2.amazoncognito.com/oauth2/token`,
+    end_session_endpoint: `https://${DomainPrefix}.auth.us-east-2.amazoncognito.com/logout`,
+    jwks_uri: `https://${Authority}/.well-known/jwks.json`,
+  },
 };
 
 function AppRoutes() {

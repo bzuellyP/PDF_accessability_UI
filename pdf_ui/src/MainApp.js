@@ -14,7 +14,7 @@ import FirstSignInDialog from './components/FirstSignInDialog';
 import HeroSection from './components/HeroSection';
 import InformationBlurb from './components/InformationBlurb';
 
-import { Authority, CheckAndIncrementQuota } from './utilities/constants';
+import { Authority, CheckAndIncrementQuota, DomainPrefix } from './utilities/constants';
 import CustomCredentialsProvider from './utilities/CustomCredentialsProvider';
 import DeploymentPopup from './components/DeploymentPopup';
 
@@ -232,7 +232,16 @@ function MainApp({ isLoggingOut, setIsLoggingOut }) {
           minHeight: '100vh'
         }}>
           <Header
-            handleSignOut={() => auth.removeUser()}
+            handleSignOut={() => {
+  setIsLoggingOut(true);
+  const domain = `https://${DomainPrefix}.auth.us-east-2.amazoncognito.com`;
+  const clientId = '5r64i15glnfblosefhghiqdgvr';
+  const logoutUri = encodeURIComponent('https://pdftool.it.purdue.edu/home');
+  const idToken = auth.user?.id_token;
+  auth.removeUser().then(() => {
+    window.location.href = `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}&id_token_hint=${idToken}`;
+  });
+}}
             usageCount={usageCount}
             refreshUsage={refreshUsage}
             usageError={usageError}
