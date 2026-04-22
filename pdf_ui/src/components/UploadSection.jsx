@@ -277,10 +277,14 @@ function UploadSection({ onUploadComplete, awsCredentials, currentUsage, maxFile
 
 
       const params = {
-        Bucket: selectedBucket,
-        Key: `${keyPrefix}${uniqueFilename}`,
-        Body: file,
-      };
+  Bucket: selectedBucket,
+  Key: `${keyPrefix}${uniqueFilename}`,
+  Body: file,
+  Metadata: {
+    email: auth.user?.profile?.email || '',
+    department: auth.user?.profile?.department || ''
+  }
+};
 
       const command = new PutObjectCommand(params);
       await client.send(command);
