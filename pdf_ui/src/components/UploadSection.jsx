@@ -276,15 +276,23 @@ function UploadSection({ onUploadComplete, awsCredentials, currentUsage, maxFile
       const keyPrefix = selectedFormat === 'html' ? 'uploads/' : 'pdf/';
 
 
+      console.log("USER PROFILE:", auth.user?.profile);
+      console.log("EMAIL:", auth.user?.profile?.email);
+      console.log("DEPARTMENT:", auth.user?.profile?.department);
+      
       const params = {
-  Bucket: selectedBucket,
-  Key: `${keyPrefix}${uniqueFilename}`,
-  Body: file,
-  Metadata: {
-    email: auth.user?.profile?.email || '',
-    department: auth.user?.profile?.department || ''
-  }
-};
+      Bucket: selectedBucket,
+      Key: `${keyPrefix}${uniqueFilename}`,
+      Body: file,
+      Metadata: {
+        email: String(auth.user?.profile?.email || ''),
+        department: String(
+        auth.user?.profile?.department ||
+        auth.user?.profile?.['custom:department'] ||
+      ''
+      )
+      }
+      };
 
       const command = new PutObjectCommand(params);
       await client.send(command);
