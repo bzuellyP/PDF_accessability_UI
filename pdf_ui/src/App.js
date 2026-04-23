@@ -21,7 +21,7 @@ import MaintenancePage from './pages/MaintenancePage';
 const cognitoAuthConfig = {
   authority: `https://${Authority}`,
   client_id: UserPoolClientId,
-  redirect_uri: `${HostedUIUrl}/callback`,
+  redirect_uri: `https://pdftool.it.purdue.edu/callback`,
   post_logout_redirect_uri: `${HostedUIUrl}/home`,
   response_type: 'code',
   scope: 'email openid phone profile',
