@@ -86,6 +86,7 @@ export class CdkBackendStack extends cdk.Stack {
     const Default_Group = 'DefaultUsers';
     const Amazon_Group = 'AmazonUsers';
     const Admin_Group = 'AdminUsers';
+    const Purdue_Group = 'PurdueUsers';
     const appUrl = `https://main.${amplifyApp.appId}.amplifyapp.com`;
 
     // --------- Set CORS on imported S3 buckets via custom resource ----------
@@ -184,6 +185,7 @@ export class CdkBackendStack extends cdk.Stack {
         DEFAULT_GROUP_NAME: Default_Group,
         AMAZON_GROUP_NAME: Amazon_Group,
         ADMIN_GROUP_NAME: Admin_Group,
+        PURDUE_GROUP_NAME: Purdue_Group,
       },
     });
 
@@ -264,6 +266,14 @@ export class CdkBackendStack extends cdk.Stack {
         userPoolId: userPool.userPoolId,
         description: 'Group for Amazon Employees',
         precedence: 2,
+      });
+
+      // Purdue Users Group
+      const purdueUsersGroup = new cognito.CfnUserPoolGroup(this, 'PurdueUsersGroup', {
+        groupName: Purdue_Group,
+        userPoolId: userPool.userPoolId,
+        description: 'Group for Purdue University users',
+        precedence: 1,
       });
 
       // Admin Users Group
