@@ -12,7 +12,7 @@ def handler(event, context):
     DEFAULT_GROUP = str(os.environ.get('DEFAULT_GROUP_NAME'))
     AMAZON_GROUP = str(os.environ.get('AMAZON_GROUP_NAME'))
     ADMIN_GROUP = str(os.environ.get('ADMIN_GROUP_NAME'))
-    PURDUE_GROUP = str(os.environ.get('PURUDE_GROUP_NAME'))
+    PURDUE_GROUP = str(os.environ.get('PURDUE_GROUP_NAME'))
 
     # Define attribute defaults based on group
     group_attributes = {
