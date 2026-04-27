@@ -12,7 +12,7 @@ def handler(event, context):
     DEFAULT_GROUP = str(os.environ.get('DEFAULT_GROUP_NAME'))
     AMAZON_GROUP = str(os.environ.get('AMAZON_GROUP_NAME'))
     ADMIN_GROUP = str(os.environ.get('ADMIN_GROUP_NAME'))
-    PURDUE_GROUP = str(os.environ.get('PURDUE_GROUP_NAME'))
+    
 
     # Define attribute defaults based on group
     group_attributes = {
@@ -28,13 +28,6 @@ def handler(event, context):
             'custom:total_files_uploaded': '0',
             'custom:max_files_allowed': '15',
             'custom:max_pages_allowed': '10',
-            'custom:max_size_allowed_MB': '25'
-        },
-        PURDUE_GROUP: {
-            'custom:first_sign_in': 'true',
-            'custom:total_files_uploaded': '0',
-            'custom:max_files_allowed': '25',
-            'custom:max_pages_allowed': '25',
             'custom:max_size_allowed_MB': '25'
         },
         ADMIN_GROUP: {
@@ -61,8 +54,8 @@ def handler(event, context):
         if user_email.endswith('@amazon.com'):
             assigned_group = AMAZON_GROUP
         # Example logic to assign to AdminUsers based on a specific condition
-        elif user_email.endswith('@purdue.edu'):
-            assigned_group = PURDUE_GROUP
+        # elif user_email.endswith(''):
+         #   assigned_group = 
 
         # Add user to the assigned group
         cognito_idp.admin_add_user_to_group(
