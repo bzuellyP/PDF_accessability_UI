@@ -32,6 +32,13 @@ GROUP_LIMITS = {
         'custom:max_pages_allowed': '10',
         'custom:max_size_allowed_MB': '25'
     },
+    'PurdueUsers': {
+        # 'custom:first_sign_in': 'true',
+        # 'custom:total_files_uploaded': '0',  # optionally reset
+        'custom:max_files_allowed': '25',
+        'custom:max_pages_allowed': '25',
+        'custom:max_size_allowed_MB': '25'
+    },
     'AdminUsers': {
         # 'custom:first_sign_in': 'true',
         # 'custom:total_files_uploaded': '0',  # optionally reset
@@ -42,7 +49,7 @@ GROUP_LIMITS = {
 }
 
 # Define a precedence: The first match in this list is considered "highest" precedence.
-GROUP_PRECEDENCE = ['AdminUsers', 'AmazonUsers', 'DefaultUsers']
+GROUP_PRECEDENCE = ['AdminUsers', 'PurdueUsers', 'DefaultUsers']
 
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 # Do not change below for normal usage
